@@ -1,0 +1,184 @@
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy List</title>
+    <link rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+        html {
+            overflow-y: scroll;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: black;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        a {
+            color: black;
+        }
+
+        #mode {
+            text-align: center;
+        }
+
+        #mode li {
+            display: inline;
+
+        }
+
+        #slist {
+            padding-left: 32vw;
+        }
+
+        button {
+            border: none;
+            background: rgb(255, 255, 255);
+            color: rgb(29, 29, 29);
+            width: 120px;
+            height: 50px;
+            font-size: 20px;
+            margin-right: 20px;
+            cursor: pointer;
+            border-bottom: 2px solid white;
+            text-align: center;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .active {
+            border-bottom: 2px solid black;
+        }
+
+        p {
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+
+        .site_type {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Proxy List</h1>
+    <p id="count">site count: none</p>
+    <div class="site_type">
+        <select name="type" title="site type" id="site_type">
+            <option value="proxy">proxy</option>
+            <option value="youtube">youtube</option>
+        </select>
+    </div>
+    <ul id="mode">
+        <li><button type="button" id="all" class="type active">all</button></li>
+        <li><button type="button" id="verifyed" class="type">verifyed</button></li>
+        <li><button type="button" id="unverifyed" class="type">unverifyed</button></li>
+    </ul>
+
+    <ul id="slist">
+
+    </ul>
+</body>
+
+<script>
+    let sitecount = 0;
+    let GetType = "all"
+    const type = document.querySelectorAll(".type");
+    const allsite = document.getElementById("all");
+    const verifyedsite = document.getElementById("verifyed");
+    const unverifyedsite = document.getElementById("unverifyed");
+    const GetSiteType = document.getElementById("site_type");
+
+    GetSiteType.addEventListener("change", function() {
+        showlist(GetType);
+    })
+
+    type.forEach(item => {
+        item.addEventListener("click", activetype);
+    })
+
+    allsite.addEventListener("click", function () {
+        GetType = "all";
+        showlist(GetType);
+    })
+
+    verifyedsite.addEventListener("click", function () {
+        GetType = "verifyed";
+        showlist(GetType);
+    })
+
+    unverifyedsite.addEventListener("click", function () {
+        GetType = "unverifyed";
+        showlist(GetType);
+    })
+    async function fetchdata(type) {
+        try {
+            const GetSiteType = document.getElementById("site_type");
+            const SiteType = GetSiteType.options[GetSiteType.selectedIndex].value;
+            const hostname = location.hostname;
+            let fetchto;
+            if (SiteType == "proxy") {
+                if (hostname == "localhost") {
+                    fetchto = `http://localhost:3000/data/${type}`;
+                } else {
+                    fetchto = `https://${hostname}/data/${type}`;
+                }
+            } else {
+                if (hostname == "localhost") {
+                    fetchto = `http://localhost:3000/data/y/${type}`;
+                } else {
+                    fetchto = `https://${hostname}/data/y/${type}`;
+                }
+            }
+            const sitelist = await fetch(fetchto);
+            const data = await sitelist.json();
+            return data;
+        } catch (error) {
+            console.log("failed", error)
+            return null;
+        }
+    }
+
+    async function showlist(type) {
+        const slist = document.getElementById("slist");
+        const data = await fetchdata(type);
+        slist.innerHTML = "";
+        sitecount = data.site.length;
+        if (data.site[0] == "none") {
+            document.getElementById("count").textContent = `site count: none`;
+        } else {
+            document.getElementById("count").textContent = `site count: ${sitecount}`;
+        }
+        for (let i = 0; i < data.site.length; i++) {
+            const s = data.site[i];
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.setAttribute("href", s);
+            a.textContent = s;
+            li.appendChild(a);
+            slist.appendChild(li);
+        }
+    }
+
+    function activetype() {
+        type.forEach(item => {
+            item.classList.remove("active");
+        })
+        this.classList.add("active");
+    }
+
+    showlist("all");
+</script>
+
+</html>
