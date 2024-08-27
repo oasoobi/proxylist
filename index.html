@@ -102,44 +102,40 @@
 
     GetSiteType.addEventListener("change", function() {
         showlist(GetType);
-    })
+    });
 
     type.forEach(item => {
         item.addEventListener("click", activetype);
-    })
+    });
 
     allsite.addEventListener("click", function () {
         GetType = "all";
         showlist(GetType);
-    })
+    });
 
     verifyedsite.addEventListener("click", function () {
         GetType = "verifyed";
         showlist(GetType);
-    })
+    });
 
     unverifyedsite.addEventListener("click", function () {
         GetType = "unverifyed";
         showlist(GetType);
-    })
+    });
+
     async function fetchdata(type) {
-        try {
-            const GetSiteType = document.getElementById("site_type");
-            const SiteType = GetSiteType.options[GetSiteType.selectedIndex].value;
-            let fetchto;
-            if (SiteType == "proxy") {
-                fetchto = `http://localhost:3000/data/${type}.json`;
-            } else 
-                fetchto = `https://${hostname}/data/y/${type}.json`;
-            }
-            const sitelist = await fetch(fetchto);
-            const data = await sitelist.json();
-            return data;
-        } catch (error) {
-            console.log("failed", error)
-            return null;
+        const GetSiteType = document.getElementById("site_type");
+        const SiteType = GetSiteType.options[GetSiteType.selectedIndex].value;
+        let fetchto = "";
+        if (SiteType == "proxy") {
+            fetchto = `/data/${type}.json`;
+        } else 
+            fetchto = `/data/youtube/${type}.json`;
         }
-    }
+        const sitelist = await fetch(fetchto);
+        const data = await sitelist.json();
+        return data;
+    };
 
     async function loadlist(type) {
         const slist = document.getElementById("slist");
