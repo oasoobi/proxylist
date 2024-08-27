@@ -101,7 +101,7 @@
     const GetSiteType = document.getElementById("site_type");
 
     GetSiteType.addEventListener("change", function() {
-        showlist(GetType);
+        loadlist(GetType);
     });
 
     type.forEach(item => {
@@ -110,17 +110,17 @@
 
     allsite.addEventListener("click", function () {
         GetType = "all";
-        showlist(GetType);
+        loadlist(GetType);
     });
 
     verifyedsite.addEventListener("click", function () {
         GetType = "verifyed";
-        showlist(GetType);
+        loadlist(GetType);
     });
 
     unverifyedsite.addEventListener("click", function () {
         GetType = "unverifyed";
-        showlist(GetType);
+        loadlist(GetType);
     });
 
     async function fetchdata(type) {
@@ -129,12 +129,15 @@
         let fetchto = "";
         if (SiteType == "proxy") {
             fetchto = `/data/${type}.json`;
-        } else 
+        } else {
             fetchto = `/data/youtube/${type}.json`;
         }
-        const sitelist = await fetch(fetchto);
-        const data = await sitelist.json();
-        return data;
+        const response = await fetch(fetchto);
+        if (response.ok) {
+            const data = await response.json();
+            return data;   
+        }
+        return null;
     };
 
     async function loadlist(type) {
@@ -165,7 +168,7 @@
         this.classList.add("active");
     }
 
-    loadlist("all");
+    loadlist("verifyed");
 </script>
 
 </html>
