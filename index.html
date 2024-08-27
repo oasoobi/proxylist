@@ -126,20 +126,11 @@
         try {
             const GetSiteType = document.getElementById("site_type");
             const SiteType = GetSiteType.options[GetSiteType.selectedIndex].value;
-            const hostname = location.hostname;
             let fetchto;
             if (SiteType == "proxy") {
-                if (hostname == "localhost") {
-                    fetchto = `http://localhost:3000/data/${type}`;
-                } else {
-                    fetchto = `https://${hostname}/data/${type}`;
-                }
-            } else {
-                if (hostname == "localhost") {
-                    fetchto = `http://localhost:3000/data/y/${type}`;
-                } else {
-                    fetchto = `https://${hostname}/data/y/${type}`;
-                }
+                fetchto = `http://localhost:3000/data/${type}.json`;
+            } else 
+                fetchto = `https://${hostname}/data/y/${type}.json`;
             }
             const sitelist = await fetch(fetchto);
             const data = await sitelist.json();
@@ -150,7 +141,7 @@
         }
     }
 
-    async function showlist(type) {
+    async function loadlist(type) {
         const slist = document.getElementById("slist");
         const data = await fetchdata(type);
         slist.innerHTML = "";
@@ -178,7 +169,7 @@
         this.classList.add("active");
     }
 
-    showlist("all");
+    loadlist("all");
 </script>
 
 </html>
